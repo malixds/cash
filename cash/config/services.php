@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'playwallet' => [
+        'base_url' => env('PLAYWALLET_BASE_URL', 'https://dev.merchant.playwallet.bot/api/merchant/'),
+        'api_key' => env('PLAYWALLET_API_KEY'),
+        'timeout' => (int) env('PLAYWALLET_TIMEOUT', 15),
+    ],
+
 ];

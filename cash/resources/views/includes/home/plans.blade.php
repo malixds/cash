@@ -1,17 +1,8 @@
 <section id="plans" class="section">
     <h3>Рассчитайте пополнение</h3>
+    <div class="catalog-region-single">Регион: <strong>Россия</strong></div>
     <div class="topup-wrap">
         <form class="topup-form" id="topupForm">
-            <!-- <label class="field">
-                <span>Регион аккаунта</span>
-                <select id="region" name="region">
-                    <option value="ru" selected>Россия</option>
-                    <option value="kz">Казахстан</option>
-                    <option value="tr">Турция</option>
-                    <option value="other">Другой регион</option>
-                </select>
-            </label> -->
-
             <div class="field-row">
                 <label class="field">
                     <span>Никнейм</span>
