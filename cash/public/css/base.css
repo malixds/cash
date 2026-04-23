@@ -1,0 +1,96 @@
+:root {
+    --bg: #070d26;
+    --surface: #111b46;
+    --surface-soft: #182558;
+    --text: #e7ecff;
+    --muted: #b7c1e7;
+    --accent: #be2d67;
+    --accent-soft: #8e2ad4;
+    --line: #2b3976;
+    --border-line: #585D88;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+    color: var(--text);
+    background:
+        radial-gradient(1200px 500px at 10% -10%, rgba(142, 42, 212, 0.3), transparent),
+        radial-gradient(1000px 420px at 90% 0%, rgba(190, 45, 103, 0.26), transparent),
+        var(--bg);
+}
+
+.container {
+    width: min(1120px, 92%);
+    margin: 0 auto;
+}
+
+.topbar {
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(7, 13, 38, 0.75);
+    backdrop-filter: blur(8px);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+.topbar-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.brand {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+}
+
+.brand span { color: #ff6fa8; }
+
+.badge {
+    font-size: 12px;
+    color: #ffd8ea;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: linear-gradient(120deg, rgba(190, 45, 103, 0.25), rgba(142, 42, 212, 0.25));
+}
+
+.section { padding: 18px 0 34px; }
+.section h3 { font-size: 30px; margin: 0 0 16px; }
+
+.button {
+    text-decoration: none;
+    border-radius: 12px;
+    padding: 12px 18px;
+    font-weight: 700;
+    font-size: 14px;
+    transition: 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.button-primary {
+    background: linear-gradient(120deg, var(--accent), var(--accent-soft));
+    color: #fff;
+    box-shadow: 0 8px 28px rgba(190, 45, 103, 0.38);
+}
+
+.button-secondary {
+    color: var(--text);
+    border-color: var(--line);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.button:hover { transform: translateY(-1px); }
+
+footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 24px 0 36px;
+    color: var(--muted);
+    font-size: 13px;
+}
