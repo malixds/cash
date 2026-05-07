@@ -6,7 +6,7 @@
             <div class="field-row">
                 <label class="field">
                     <span>Никнейм</span>
-                    <input id="nickname" name="nickname" type="text" placeholder="Введите логин Steam" required>
+                    <input id="login" name="login" type="text" placeholder="Введите логин Steam" required>
                 </label>
 
                 <label class="field">

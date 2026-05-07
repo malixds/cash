@@ -3,13 +3,13 @@
 namespace App\Services\Orders;
 
 use App\Models\Order;
-use App\Services\PlayWallet\PlayWalletClient;
+use App\Services\PlayWallet\PlayWalletClientService;
 use Throwable;
 
 class OrderProcessor
 {
     public function __construct(
-        private readonly PlayWalletClient $playWalletClient,
+        private readonly PlayWalletClientService $playWalletClient,
     ) {
     }
 
@@ -24,10 +24,10 @@ class OrderProcessor
             }
 
             $createData = $this->playWalletClient->createOrder(
-                externalId: (string) $order->public_id,
-                serviceId: $serviceId,
                 amount: number_format($order->amount_rub, 2, '.', ''),
                 login: $order->steam_login,
+                externalId: (string) $order->public_id,
+                serviceId: $serviceId,
             );
 
             $payData = $this->playWalletClient->payOrder(

@@ -11,3 +11,4 @@ Route::get('/mock-provider/payments/{orderPublicId}/{paymentId}', [MockPaymentPa
     ->name('mock.payments.show');
 Route::post('/mock-provider/payments/{orderPublicId}/{paymentId}/complete', [MockPaymentPageController::class, 'complete'])
     ->name('mock.payments.complete');
+

@@ -5,21 +5,33 @@ namespace App\Services\PlayWallet;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 
-class PlayWalletClient
+class PlayWalletClientService
 {
     public function getBalance(): array
     {
         return $this->request('get', 'get-balance');
     }
 
-    public function createOrder(string $externalId, string $serviceId, string $amount, string $login): array
-    {
-        return $this->request('post', 'create-order/', [
-            'externalId' => $externalId,
-            'serviceId' => $serviceId,
+    public function createOrder(
+        string $amount,
+        string $login,
+        ?string $externalId = null,
+        ?string $serviceId = null,
+    ): array {
+        $payload = [
             'amount' => $amount,
             'login' => $login,
-        ]);
+        ];
+
+        if ($externalId !== null && $externalId !== '') {
+            $payload['externalId'] = $externalId;
+        }
+
+        if ($serviceId !== null && $serviceId !== '') {
+            $payload['serviceId'] = $serviceId;
+        }
+
+        return $this->request('post', 'create-order/', $payload);
     }
 
     public function payOrder(string $id, string $externalId, string $createdDateTime): array

@@ -42,7 +42,7 @@
 
                     const formData = new FormData(form);
                     const payload = {
-                        nickname: String(formData.get('nickname') || ''),
+                        login: String(formData.get('login') || ''),
                         amount: Number(formData.get('amount') || 0),
                         promo: String(formData.get('promo') || ''),
                         payment_method: getSelectedPaymentMethod(),
@@ -50,7 +50,7 @@
 
                     try {
                         setButtonState(true);
-                        const response = await fetch('/api/checkout', {
+                        const response = await fetch('/api/orders/create', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',

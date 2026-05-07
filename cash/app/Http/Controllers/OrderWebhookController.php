@@ -8,7 +8,7 @@ use App\Services\Payments\MockPaymentProvider;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class PaymentWebhookController extends Controller
+class OrderWebhookController extends Controller
 {
     public function mockPaid(
         Request $request,
