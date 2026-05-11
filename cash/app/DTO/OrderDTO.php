@@ -8,7 +8,7 @@ class OrderDTO
 {
     public function __construct(
         public readonly string $steamLogin,
-        public readonly int $amountRub,
+        public readonly int $amount,
         public readonly ?string $promoCode,
         public readonly string $paymentMethod,
     ) {
@@ -23,7 +23,7 @@ class OrderDTO
 
         return new self(
             steamLogin: (string) $validated['login'],
-            amountRub: max(0, (int) $validated['amount']),
+            amount: max(0, (int) $validated['amount']),
             promoCode: $promo !== '' ? $promo : null,
             paymentMethod: (string) $validated['payment_method'],
         );
@@ -35,14 +35,16 @@ class OrderDTO
     public function toOrderAttributes(): array
     {
         $publicId = (string) Str::uuid();
-        $totalRub = (int) ceil($this->amountRub * 1.05);
+        $externalId = (string) Str::uuid();
+        $total = (int) ceil($this->amount * 1.05);
 
         return [
             'public_id' => $publicId,
+            'external_id' => $externalId,
             'steam_login' => $this->steamLogin,
             'region' => 'ru',
-            'amount_rub' => $this->amountRub,
-            'total_rub' => $totalRub,
+            'amount' => $this->amount,
+            'total' => $total,
             'promo_code' => $this->promoCode,
             'payment_method' => $this->paymentMethod,
             'status' => 'pending',

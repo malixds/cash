@@ -9,10 +9,11 @@ class Order extends Model
 {
     protected $fillable = [
         'public_id',
+        'external_id',
         'steam_login',
         'region',
-        'amount_rub',
-        'total_rub',
+        'amount',
+        'total',
         'promo_code',
         'payment_method',
         'status',

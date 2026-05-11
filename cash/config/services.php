@@ -36,9 +36,16 @@ return [
     ],
 
     'playwallet' => [
-        'base_url' => env('PLAYWALLET_BASE_URL', 'https://dev.merchant.playwallet.bot/api/merchant/'),
-        'api_key' => env('PLAYWALLET_API_KEY'),
-        'timeout' => (int) env('PLAYWALLET_TIMEOUT', 15),
+        'url_dev' => env('PLAYWALLET_URL_DEV', 'https://dev.merchant.playwallet.bot/api/merchant/'),
+        'api_key_dev' => env('PLAYWALLET_API_KEY_DEV'),
+        'url_prod' => env('PLAYWALLET_URL_PROD', 'https://merchant.playwallet.bot/api/merchant/'),
+        'api_key_prod' => env('PLAYWALLET_API_KEY_PROD'),
+        'service_id' => env('PLAYWALLET_SERVICE_ID'),
     ],
 
+    'yookassa' => [
+        'shop_id' => env('YOOKASSA_ID'),
+        'secret_key' => env('YOOKASSA_KEY'),
+        'return_url' => env('YOOKASSA_RETURN_URL'),
+    ],
 ];

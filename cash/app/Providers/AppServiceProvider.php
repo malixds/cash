@@ -2,7 +2,17 @@
 
 namespace App\Providers;
 
+use App\Interfaces\Orders\IOrderRepository;
+use App\Interfaces\Payments\IPaymentRepository;
+use App\Interfaces\PlayWallets\IPlayWalletRepository;
+use App\Interfaces\SteamPay\SteamPayClientInterface;
+use App\Repositories\Orders\OrderRepository;
+use App\Repositories\Payments\PaymentRepository;
+use App\Repositories\PlayWallets\PlayWalletRepository;
+use App\Services\PlayWallet\PlayWalletClientServiceDev;
 use Illuminate\Support\ServiceProvider;
+use RuntimeException;
+use YooKassa\Client;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -11,7 +21,38 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(
+            IPaymentRepository::class,
+            PaymentRepository::class
+        );
+        $this->app->bind(
+            IOrderRepository::class,
+            OrderRepository::class
+        );
+
+        $this->app->bind(
+            IPlayWalletRepository::class,
+            PlayWalletRepository::class
+        );
+
+        $this->app->bind(
+            SteamPayClientInterface::class,
+            PlayWalletClientServiceDev::class
+        );
+
+        $this->app->singleton(Client::class, function (): Client {
+            $shopId = (string) config('services.yookassa.shop_id', '');
+            $secretKey = (string) config('services.yookassa.secret_key', '');
+
+            if ($shopId === '' || $secretKey === '') {
+                throw new RuntimeException('YooKassa credentials are not configured (YOOKASSA_ID / YOOKASSA_KEY).');
+            }
+
+            $client = new Client;
+            $client->setAuth($shopId, $secretKey);
+
+            return $client;
+        });
     }
 
     /**

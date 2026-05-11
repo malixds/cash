@@ -102,5 +102,30 @@ services:
     networks:
       - laravel
 
+  # Long-running queue worker (same PHP app code as FPM). Restart policy keeps it up after crashes.
+  queue:
+    build:
+      context: ./dockerfiles
+      dockerfile: php.dockerfile
+      args:
+        - UID=${UID:-1000}
+        - GID=${GID:-1000}
+    volumes:
+      - ./cash:/var/www/html:delegated
+    depends_on:
+      - postgres
+      - redis
+    entrypoint:
+      - php
+      - /var/www/html/artisan
+      - queue:work
+      - --verbose
+      - --tries=3
+      - --timeout=120
+      - --sleep=3
+    restart: unless-stopped
+    networks:
+      - laravel
+
 volumes:
   postgres:

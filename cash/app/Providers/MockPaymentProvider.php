@@ -1,13 +1,15 @@
 <?php
 
-namespace App\Services\Payments;
+namespace App\Providers;
 
+use App\DTO\Payments\PaymentProviderResultDTO;
+use App\Interfaces\Payments\PaymentProviderInterface;
 use App\Models\Order;
 use Illuminate\Support\Str;
 
 class MockPaymentProvider implements PaymentProviderInterface
 {
-    public function createPayment(Order $order): PaymentProviderResult
+    public function createPayment(Order $order): PaymentProviderResultDTO
     {
         $providerPaymentId = (string) Str::uuid();
         $paymentUrl = route('mock.payments.show', [
@@ -15,7 +17,7 @@ class MockPaymentProvider implements PaymentProviderInterface
             'paymentId' => $providerPaymentId,
         ]);
 
-        return new PaymentProviderResult(
+        return new PaymentProviderResultDTO(
             providerPaymentId: $providerPaymentId,
             paymentUrl: $paymentUrl,
             payload: [

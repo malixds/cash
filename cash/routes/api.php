@@ -3,6 +3,7 @@
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderWebhookController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\YookassaPaymentPageController;
 use Illuminate\Support\Facades\Route;
 
 //Route::post('/checkout', [CheckoutController::class, 'store']);
@@ -21,4 +22,9 @@ Route::prefix('orders')->group(function () {
     Route::post('/create', [OrderController::class, 'createOrder'])->name('order.create');
     Route::post('/pay', [OrderController::class, 'createPay']);
     Route::get('/{id}', [OrderController::class, 'show']);
+});
+
+Route::prefix('payments')->group(function () {
+    Route::get('/status', [YookassaPaymentPageController::class, 'getStatus']);
+    Route::post('/webhook', [YookassaPaymentPageController::class, 'webhook']);
 });

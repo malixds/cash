@@ -13,7 +13,11 @@ return new class extends Migration
     {
         Schema::create('play_wallet_orders', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->foreignId('order_id')->constrained()->cascadeOnDelete();
+            $table->string('status')->default('pending');
+            $table->json('payload')->nullable();
+            $table->time('created_at')->default(now());
+            $table->time('updated_at')->nullable();
         });
     }
 

@@ -11,20 +11,17 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->uuid('public_id')->unique();
+            $table->uuid('external_id')->unique();
             $table->string('steam_login');
             $table->string('region')->default('ru');
-            $table->unsignedInteger('amount_rub');
-            $table->unsignedInteger('total_rub');
+            $table->unsignedInteger('amount');
+            $table->unsignedInteger('total');
             $table->string('promo_code')->nullable();
             $table->string('payment_method');
             $table->string('status')->default('pending');
-            $table->string('playwallet_order_id')->nullable();
-            $table->string('playwallet_status')->nullable();
-            $table->json('playwallet_payload')->nullable();
             $table->text('error_message')->nullable();
-            $table->timestamp('paid_at')->nullable();
-            $table->timestamp('completed_at')->nullable();
-            $table->timestamps();
+            $table->timestamp('created_at')->default(now());
+            $table->timestamp('updated_at')->nullable();
         });
     }
 

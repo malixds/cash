@@ -18,7 +18,7 @@
     <p class="muted">Имитация платёжного провайдера для теста сценария.</p>
     <p>Заказ: <strong>{{ $order->public_id }}</strong></p>
     <p>Steam логин: <strong>{{ $order->steam_login }}</strong></p>
-    <p class="amount">{{ number_format($order->total_rub, 0, ',', ' ') }} ₽</p>
+    <p class="amount">{{ number_format($order->total, 0, ',', ' ') }} ₽</p>
 
     <form method="post" action="{{ route('mock.payments.complete', ['orderPublicId' => $order->public_id, 'paymentId' => $payment->provider_payment_id]) }}">
         @csrf

@@ -9,6 +9,8 @@
       <sourceFolder url="file://$MODULE_DIR$/cash/tests" isTestSource="true" packagePrefix="Tests\" />
       <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/cash/tests/Feature" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/cash/tests/Unit" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/src/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/src/vendor/telegram-bot/api" />
       <excludeFolder url="file://$MODULE_DIR$/cash/vendor/brick/math" />
@@ -105,19 +107,21 @@
       <excludeFolder url="file://$MODULE_DIR$/cash/vendor/symfony/polyfill-php80" />
       <excludeFolder url="file://$MODULE_DIR$/cash/vendor/symfony/polyfill-php84" />
       <excludeFolder url="file://$MODULE_DIR$/cash/vendor/symfony/polyfill-php85" />
-      <excludeFolder url="file://$MODULE_DIR$/cash/vendor/symfony/polyfill-uuid" />
       <excludeFolder url="file://$MODULE_DIR$/cash/vendor/symfony/process" />
       <excludeFolder url="file://$MODULE_DIR$/cash/vendor/symfony/routing" />
       <excludeFolder url="file://$MODULE_DIR$/cash/vendor/symfony/service-contracts" />
       <excludeFolder url="file://$MODULE_DIR$/cash/vendor/symfony/string" />
       <excludeFolder url="file://$MODULE_DIR$/cash/vendor/symfony/translation" />
       <excludeFolder url="file://$MODULE_DIR$/cash/vendor/symfony/translation-contracts" />
-      <excludeFolder url="file://$MODULE_DIR$/cash/vendor/symfony/uid" />
       <excludeFolder url="file://$MODULE_DIR$/cash/vendor/symfony/var-dumper" />
       <excludeFolder url="file://$MODULE_DIR$/cash/vendor/theseer/tokenizer" />
       <excludeFolder url="file://$MODULE_DIR$/cash/vendor/tijsverkoyen/css-to-inline-styles" />
       <excludeFolder url="file://$MODULE_DIR$/cash/vendor/vlucas/phpdotenv" />
       <excludeFolder url="file://$MODULE_DIR$/cash/vendor/voku/portable-ascii" />
+      <excludeFolder url="file://$MODULE_DIR$/cash/vendor/php-ds/php-ds" />
+      <excludeFolder url="file://$MODULE_DIR$/cash/vendor/symfony/polyfill-php86" />
+      <excludeFolder url="file://$MODULE_DIR$/cash/vendor/yoomoney/yookassa-sdk-php" />
+      <excludeFolder url="file://$MODULE_DIR$/cash/vendor/yoomoney/yookassa-sdk-validator" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

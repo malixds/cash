@@ -8,9 +8,9 @@ use App\Enums\Payment\PaymentsStatusEnum;
 use App\Http\Requests\OrderCreateRequest;
 use App\Models\Order;
 use App\Models\Payment;
-use App\Services\Payments\MockPaymentProvider;
-use App\Services\PlayWallet\PlayWalletClientService;
-use App\Services\PlayWallet\PlayWalletException;
+use App\Providers\MockPaymentProvider;
+use App\Providers\YookassaPaymentProvider;
+use App\Services\PlayWallet\PlayWalletClientServiceDev;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +18,7 @@ use Illuminate\Validation\ValidationException;
 
 class OrderController extends Controller
 {
-    public function balance(PlayWalletClientService $client): JsonResponse
+    public function balance(PlayWalletClientServiceDev $client): JsonResponse
     {
         return response()->json([
             'ok' => true,
@@ -30,7 +30,7 @@ class OrderController extends Controller
      * Create a pending order and mock payment, return URL for the payment page.
      *
      */
-    public function createOrder(OrderCreateRequest $request, MockPaymentProvider $paymentProvider): JsonResponse
+    public function createOrder(OrderCreateRequest $request, YookassaPaymentProvider $paymentProvider): JsonResponse
     {
         $validated = $request->validated();
         $dto = OrderDTO::fromValidated($validated);
@@ -47,10 +47,11 @@ class OrderController extends Controller
                 'provider' => 'mock',
                 'provider_payment_id' => $result->providerPaymentId,
                 'status' => PaymentsStatusEnum::NEW->value,
-                'amount_rub' => $order->total_rub,
+                'amount' => $order->total,
                 'currency' => 'RUB',
                 'payment_url' => $result->paymentUrl,
-                'provider_payload' => $result->payload,
+//                  TODO: мб надо добавить
+//                'provider_payload' => $result->payload,
             ]);
 
             return $result->paymentUrl;
@@ -69,7 +70,7 @@ class OrderController extends Controller
      *
      * @throws ValidationException
      */
-    public function payOrder(Request $request, PlayWalletClientService $client): JsonResponse
+    public function payOrder(Request $request, PlayWalletClientServiceDev $client): JsonResponse
     {
         $validated = $request->validate([
             'id' => ['required', 'string', 'max:255'],
@@ -87,7 +88,7 @@ class OrderController extends Controller
         ]);
     }
 
-    public function orderStatus(string $id, PlayWalletClientService $client): JsonResponse
+    public function orderStatus(string $id, PlayWalletClientServiceDev $client): JsonResponse
     {
         return response()->json([
             'ok' => true,
@@ -95,7 +96,7 @@ class OrderController extends Controller
         ]);
     }
 
-    public function orderList(Request $request, PlayWalletClientService $client): JsonResponse
+    public function orderList(Request $request, PlayWalletClientServiceDev $client): JsonResponse
     {
         $offset = (int)$request->integer('offset', 0);
         $limit = (int)$request->integer('limit', 10);

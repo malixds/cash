@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Payment;
+use App\Providers\MockPaymentProvider;
 use App\Services\Orders\OrderProcessor;
-use App\Services\Payments\MockPaymentProvider;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Payment;
+use App\Providers\MockPaymentProvider;
 use App\Services\Orders\OrderProcessor;
-use App\Services\Payments\MockPaymentProvider;
 use Illuminate\Http\RedirectResponse;
 
 class MockPaymentPageController extends Controller
@@ -39,7 +39,7 @@ class MockPaymentPageController extends Controller
         $payload = [
             'payment_id' => $payment->provider_payment_id,
             'status' => 'paid',
-            'amount_rub' => $payment->amount_rub,
+            'amount' => $payment->amount,
             'order_id' => $order->public_id,
         ];
 
