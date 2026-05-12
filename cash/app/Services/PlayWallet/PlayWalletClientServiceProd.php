@@ -3,12 +3,13 @@
 namespace App\Services\PlayWallet;
 
 use App\DTO\SteamPay\SteamPayCreateRequestDTO;
+use App\DTO\SteamPay\SteamPayCreateResultDTO;
 use App\Interfaces\SteamPay\SteamPayClientInterface;
 use Illuminate\Support\Facades\Http;
 
 class PlayWalletClientServiceProd implements SteamPayClientInterface
 {
-    public function pay(SteamPayCreateRequestDTO $requestDTO): SteamPayCreateRequestDTO
+    public function pay(SteamPayCreateRequestDTO $requestDTO): SteamPayCreateResultDTO
     {
         $response = Http::post(
             (string) config('services.playwallet.url_prod', ''),
