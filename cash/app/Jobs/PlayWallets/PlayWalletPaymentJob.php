@@ -7,6 +7,7 @@ use App\DTO\SteamPay\SteamPayCreateRequestDTO;
 use App\Enums\PlayWalletEnums\ResponseEnum;
 use App\Interfaces\PlayWallets\IPlayWalletRepository;
 use App\Interfaces\SteamPay\SteamPayClientInterface;
+use App\Services\PlayWallet\PlayWalletRequestContext;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -21,9 +22,13 @@ class PlayWalletPaymentJob implements ShouldQueue
     public function handle(
         IPlayWalletRepository $repository,
         SteamPayClientInterface $steamPayClient,
+        PlayWalletRequestContext $requestContext,
     ): void
     {
+        $requestContext->bind($this->dto->orderId());
+
         $playWalletOrder = $repository->create($this->dto);
+        $requestContext->setPlayWalletOrderId($playWalletOrder->id);
         $steamPayCreateRequestDTO = new SteamPayCreateRequestDTO(
             externalId: $this->dto->externalOrderId(),
             serviceId: $this->dto->serviceId(),

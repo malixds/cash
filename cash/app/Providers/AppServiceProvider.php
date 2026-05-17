@@ -10,6 +10,8 @@ use App\Repositories\Orders\OrderRepository;
 use App\Repositories\Payments\PaymentRepository;
 use App\Repositories\PlayWallets\PlayWalletRepository;
 use App\Services\PlayWallet\PlayWalletClientServiceDev;
+use App\Services\PlayWallet\PlayWalletRequestContext;
+use App\Services\PlayWallet\PlayWalletRequestLogger;
 use Illuminate\Support\ServiceProvider;
 use RuntimeException;
 use YooKassa\Client;
@@ -35,10 +37,14 @@ class AppServiceProvider extends ServiceProvider
             PlayWalletRepository::class
         );
 
+        $this->app->scoped(PlayWalletRequestContext::class);
+
         $this->app->bind(
             SteamPayClientInterface::class,
             PlayWalletClientServiceDev::class
         );
+
+        $this->app->bind(PlayWalletRequestLogger::class);
 
         $this->app->singleton(Client::class, function (): Client {
             $shopId = (string) config('services.yookassa.shop_id', '');

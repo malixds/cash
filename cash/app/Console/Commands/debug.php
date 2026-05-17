@@ -126,7 +126,6 @@ class debug extends Command
     private function simulateYookassaSucceeded(Order $order, Payment $payment): void
     {
         $payment->update(['status' => PaymentsStatusEnum::SUCCEEDED->value]);
-        $order->update(['status' => OrderStatusEnum::PAID->value]);
 
         $this->info('Payment marked as succeeded (YooKassa webhook simulated)');
 

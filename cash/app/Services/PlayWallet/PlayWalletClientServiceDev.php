@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\Http;
 
 class PlayWalletClientServiceDev implements SteamPayClientInterface
 {
+    public function __construct(
+        private readonly PlayWalletRequestLogger $requestLogger,
+    ) {}
+
     /**
      * @throws ConnectionException
      * @throws PlayWalletException
@@ -119,7 +123,10 @@ class PlayWalletClientServiceDev implements SteamPayClientInterface
      */
     private function post(string $endpoint, array $body): array
     {
-        $httpResponse = $this->http()->post($this->url($endpoint), $body);
+        $url = $this->url($endpoint);
+        $httpResponse = $this->http()->post($url, $body);
+
+        $this->requestLogger->log('POST', $endpoint, $url, $body, $httpResponse);
 
         return $this->decodeResponse($httpResponse, $endpoint);
     }
@@ -129,7 +136,14 @@ class PlayWalletClientServiceDev implements SteamPayClientInterface
      */
     private function get(string $endpoint, array $query = []): array
     {
-        $httpResponse = $this->http()->get($this->url($endpoint), $query);
+        $url = $this->url($endpoint);
+        $httpResponse = $this->http()->get($url, $query);
+
+        $loggedUrl = $query === []
+            ? $url
+            : $url . '?' . http_build_query($query);
+
+        $this->requestLogger->log('GET', $endpoint, $loggedUrl, $query === [] ? null : $query, $httpResponse);
 
         return $this->decodeResponse($httpResponse, $endpoint);
     }
