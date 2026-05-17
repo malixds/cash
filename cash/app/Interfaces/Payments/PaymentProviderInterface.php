@@ -7,7 +7,7 @@ use App\Models\Order;
 
 interface PaymentProviderInterface
 {
-    public function createPayment(Order $order): PaymentProviderResultDTO;
+    public function createPayment(Order $order): array;
 
     public function verifyWebhook(array $payload, string $signature): bool;
 }

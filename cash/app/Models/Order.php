@@ -35,5 +35,10 @@ class Order extends Model
     {
         return $this->hasOne(Payment::class);
     }
+
+    public function playWalletOrder(): HasOne
+    {
+        return $this->hasOne(PlayWalletOrder::class);
+    }
 }
 

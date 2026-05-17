@@ -17,17 +17,19 @@ class PlayWalletPaymentJob implements ShouldQueue
 
     public function __construct(
         private readonly PlayWalletCreateDTO $dto,
-    ) {}
+    )
+    {
+    }
 
     public function handle(
-        IPlayWalletRepository $repository,
-        SteamPayClientInterface $steamPayClient,
+        IPlayWalletRepository    $repository,
+        SteamPayClientInterface  $steamPayClient,
         PlayWalletRequestContext $requestContext,
     ): void
     {
         $requestContext->bind($this->dto->orderId());
 
-        $playWalletOrder = $repository->create($this->dto);
+        $playWalletOrder = $repository->firstOrCreate($this->dto);
         $requestContext->setPlayWalletOrderId($playWalletOrder->id);
         $steamPayCreateRequestDTO = new SteamPayCreateRequestDTO(
             externalId: $this->dto->externalOrderId(),

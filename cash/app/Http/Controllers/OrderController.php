@@ -18,14 +18,6 @@ use Illuminate\Validation\ValidationException;
 
 class OrderController extends Controller
 {
-    public function balance(PlayWalletClientServiceDev $client): JsonResponse
-    {
-        return response()->json([
-            'ok' => true,
-            'data' => $client->getBalance(),
-        ]);
-    }
-
     /**
      * Create a pending order and mock payment, return URL for the payment page.
      *
@@ -34,24 +26,21 @@ class OrderController extends Controller
     {
         $validated = $request->validated();
         $dto = OrderDTO::fromValidated($validated);
-
         $paymentUrl = DB::transaction(function () use ($dto, $paymentProvider): string {
             $order = Order::query()->create([
                 'status' => OrderStatusEnum::NEW->value,
                 ...$dto->toOrderAttributes()
             ]);
-            $result = $paymentProvider->createPayment($order);
+            [$result, $payload] = $paymentProvider->createPayment($order);
 
             Payment::query()->create([
                 'order_id' => $order->id,
-                'provider' => 'mock',
                 'provider_payment_id' => $result->providerPaymentId,
                 'status' => PaymentsStatusEnum::NEW->value,
                 'amount' => $order->total,
                 'currency' => 'RUB',
                 'payment_url' => $result->paymentUrl,
-//                  TODO: мб надо добавить
-//                'provider_payload' => $result->payload,
+                'provider_payload' => $payload,
             ]);
 
             return $result->paymentUrl;
@@ -65,28 +54,6 @@ class OrderController extends Controller
         ]);
     }
 
-    /**
-     * Proxy for PlayWallet pay-order endpoint.
-     *
-     * @throws ValidationException
-     */
-    public function payOrder(Request $request, PlayWalletClientServiceDev $client): JsonResponse
-    {
-        $validated = $request->validate([
-            'id' => ['required', 'string', 'max:255'],
-            'externalId' => ['required', 'string', 'max:255'],
-            'createdDateTime' => ['required', 'string', 'max:255'],
-        ]);
-
-        return response()->json([
-            'ok' => true,
-            'data' => $client->payOrder(
-                id: (string)$validated['id'],
-                externalId: (string)$validated['externalId'],
-                createdDateTime: (string)$validated['createdDateTime'],
-            ),
-        ]);
-    }
 
     public function orderStatus(string $id, PlayWalletClientServiceDev $client): JsonResponse
     {

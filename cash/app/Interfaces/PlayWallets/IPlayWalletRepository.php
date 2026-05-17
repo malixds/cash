@@ -10,5 +10,7 @@ use App\Models\PlayWalletOrder;
 interface IPlayWalletRepository
 {
     public function create(PlayWalletCreateDTO $dto): PlayWalletOrder;
+    public function firstOrCreate(PlayWalletCreateDTO $dto): PlayWalletOrder;
     public function update(PlayWalletOrder $playWalletOrder, SteamPayCreateResultDTO|SteamPayPayResultDTO $dto): PlayWalletOrder;
+    public function findByOrderId(int $orderId): ?PlayWalletOrder;
 }

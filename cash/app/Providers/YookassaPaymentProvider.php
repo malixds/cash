@@ -22,7 +22,8 @@ class YookassaPaymentProvider implements PaymentProviderInterface
 {
     public function __construct(
         private readonly Client $client,
-    ) {
+    )
+    {
     }
 
     /**
@@ -38,7 +39,7 @@ class YookassaPaymentProvider implements PaymentProviderInterface
      * @throws ApiConnectionException
      * @throws UnauthorizedException
      */
-    public function createPayment(Order $order): PaymentProviderResultDTO
+    public function createPayment(Order $order): array
     {
         $payment = $this->client->createPayment(
             [
@@ -48,7 +49,7 @@ class YookassaPaymentProvider implements PaymentProviderInterface
                 ],
                 'confirmation' => [
                     'type' => 'redirect',
-                    'return_url' => (string) config('services.yookassa.return_url', 'http://localhost:80/'),
+                    'return_url' => (string)config('services.yookassa.return_url', 'http://localhost:80/'),
                 ],
                 'capture' => true, // важно
                 'description' => 'Заказ №' . $order->id,
@@ -61,10 +62,10 @@ class YookassaPaymentProvider implements PaymentProviderInterface
             uniqid('', true)
         );
 
-         return new PaymentProviderResultDTO(
+        return [new PaymentProviderResultDTO(
             providerPaymentId: $payment->getId(),
             paymentUrl: $payment->getConfirmation()->getConfirmationUrl(),
-        );
+        ), $payment->jsonSerialize()];
     }
 
     public function verifyWebhook(array $payload, string $signature): bool

@@ -13,10 +13,24 @@ class PlayWalletRepository implements IPlayWalletRepository
 {
     public function create(PlayWalletCreateDTO $dto): PlayWalletOrder
     {
-        return PlayWalletOrder::query()->create([
-            'order_id' => $dto->orderId(),
-            'status' => ResponseEnum::CREATED->value,
-        ]);
+        return PlayWalletOrder::query()
+            ->create([
+                'order_id' => $dto->orderId(),
+                'status' => ResponseEnum::CREATED->value,
+            ]);
+    }
+
+    public function firstOrCreate(PlayWalletCreateDTO $dto): PlayWalletOrder
+    {
+        $playWalletOrder = PlayWalletOrder::query()
+            ->where('order_id', $dto->orderId())
+            ->first();
+
+        if (!isset($playWalletOrder)) {
+            return $this->create($dto);
+        }
+
+        return $playWalletOrder;
     }
 
     public function update(PlayWalletOrder $playWalletOrder, SteamPayCreateResultDTO|SteamPayPayResultDTO $dto): PlayWalletOrder
@@ -29,5 +43,10 @@ class PlayWalletRepository implements IPlayWalletRepository
         ]);
 
         return $playWalletOrder->refresh();
+    }
+
+    public function findByOrderId(int $orderId): ?PlayWalletOrder
+    {
+        return PlayWalletOrder::query()->where('order_id', $orderId)->first();
     }
 }
