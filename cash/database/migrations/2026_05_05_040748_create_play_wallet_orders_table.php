@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('play_wallet_orders', function (Blueprint $table) {
             $table->id();
+            $table->uuid('play_wallet_uuid')->nullable();
             $table->foreignId('order_id')->constrained()->cascadeOnDelete();
             $table->string('status')->default('pending');
             $table->json('payload')->nullable();

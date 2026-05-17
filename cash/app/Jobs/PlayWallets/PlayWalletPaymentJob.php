@@ -4,10 +4,9 @@ namespace App\Jobs\PlayWallets;
 
 use App\DTO\PlayWallets\PlayWalletCreateDTO;
 use App\DTO\SteamPay\SteamPayCreateRequestDTO;
+use App\Enums\PlayWalletEnums\ResponseEnum;
 use App\Interfaces\PlayWallets\IPlayWalletRepository;
 use App\Interfaces\SteamPay\SteamPayClientInterface;
-use App\Models\Order;
-use App\Models\PlayWalletOrder;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -31,8 +30,21 @@ class PlayWalletPaymentJob implements ShouldQueue
             amount: $this->dto->amount(),
             login: $this->dto->login(),
         );
-        $steamPayCreateResultDTO = $steamPayClient->pay(
+
+        $steamPayCreateResultDTO = $steamPayClient->createOrder(
             requestDTO: $steamPayCreateRequestDTO
         );
+        dd($steamPayCreateResultDTO);
+        if ($steamPayCreateResultDTO->getStatus() === ResponseEnum::SUCCESS->value) {
+            $repository->update($playWalletOrder, $steamPayCreateResultDTO);
+        }
+
+        $steamPayPayResultDTO = $steamPayClient->payOrder(
+            $steamPayCreateResultDTO
+        );
+        dd($steamPayPayResultDTO);
+        if ($steamPayPayResultDTO->getStatus() === ResponseEnum::SUCCESS->value) {
+            $repository->update($playWalletOrder, $steamPayPayResultDTO);
+        }
     }
 }

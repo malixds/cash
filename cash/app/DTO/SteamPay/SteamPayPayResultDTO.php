@@ -2,7 +2,7 @@
 
 namespace App\DTO\SteamPay;
 
-readonly final class SteamPayCreateResultDTO
+final readonly class SteamPayPayResultDTO
 {
     public function __construct(
         private string $status,
@@ -12,9 +12,7 @@ readonly final class SteamPayCreateResultDTO
         private string $statusOrder,
         private string $payload,
         private string $createdDateTime,
-    )
-    {
-    }
+    ) {}
 
     public function getStatus(): string
     {

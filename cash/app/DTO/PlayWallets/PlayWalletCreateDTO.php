@@ -4,14 +4,17 @@ namespace App\DTO\PlayWallets;
 
 final readonly class PlayWalletCreateDTO
 {
+    private string $amount;
 
     public function __construct(
         private int $orderId,
         private string $externalOrderId,
         private string $serviceId,
         private string $login,
-        private string $amount,
-    ) {}
+        int|float|string $amount,
+    ) {
+        $this->amount = number_format((float) $amount, 2, '.', '');
+    }
 
     public function orderId(): int
     {

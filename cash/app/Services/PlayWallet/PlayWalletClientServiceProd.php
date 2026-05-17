@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Http;
 
 class PlayWalletClientServiceProd implements SteamPayClientInterface
 {
-    public function pay(SteamPayCreateRequestDTO $requestDTO): SteamPayCreateResultDTO
+    public function createOrder(SteamPayCreateRequestDTO $requestDTO): ?SteamPayCreateResultDTO
     {
         $response = Http::post(
             (string) config('services.playwallet.url_prod', ''),
