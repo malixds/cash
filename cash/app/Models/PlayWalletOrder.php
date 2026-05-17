@@ -9,9 +9,8 @@ class PlayWalletOrder extends Model
     protected $fillable = [
         'payment_id',
         'order_id',
+        'play_wallet_uuid',
         'status',
         'payload',
-        'created_at',
-        'updated_at',
     ];
 }

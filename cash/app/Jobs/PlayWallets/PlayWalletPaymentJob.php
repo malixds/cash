@@ -34,16 +34,22 @@ class PlayWalletPaymentJob implements ShouldQueue
         $steamPayCreateResultDTO = $steamPayClient->createOrder(
             requestDTO: $steamPayCreateRequestDTO
         );
-        dd($steamPayCreateResultDTO);
-        if ($steamPayCreateResultDTO->getStatus() === ResponseEnum::SUCCESS->value) {
-            $repository->update($playWalletOrder, $steamPayCreateResultDTO);
+
+        if ($steamPayCreateResultDTO === null
+            || $steamPayCreateResultDTO->getStatus() !== ResponseEnum::SUCCESS->value) {
+            return;
         }
 
-        $steamPayPayResultDTO = $steamPayClient->payOrder(
-            $steamPayCreateResultDTO
-        );
-        dd($steamPayPayResultDTO);
-        if ($steamPayPayResultDTO->getStatus() === ResponseEnum::SUCCESS->value) {
+        $repository->update($playWalletOrder, $steamPayCreateResultDTO);
+
+        if (in_array($steamPayCreateResultDTO->getStatusOrder(), ['completed', 'paid'], true)) {
+            return;
+        }
+
+        $steamPayPayResultDTO = $steamPayClient->payOrder($steamPayCreateResultDTO);
+
+        if ($steamPayPayResultDTO !== null
+            && $steamPayPayResultDTO->getStatus() === ResponseEnum::SUCCESS->value) {
             $repository->update($playWalletOrder, $steamPayPayResultDTO);
         }
     }

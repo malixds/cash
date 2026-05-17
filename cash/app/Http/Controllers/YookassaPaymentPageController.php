@@ -29,7 +29,6 @@ class YookassaPaymentPageController extends Controller
         }
         $payment = $this->paymentRepository->findByPaymentId($dto->id());
         $payment = $this->paymentRepository->update($payment, $dto->toArray());
-
         if ($payment->status === PaymentsStatusEnum::SUCCEEDED->value) {
             $order = $payment->order()->first();
             // TODO: что за service_id ?
