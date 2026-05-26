@@ -40,6 +40,12 @@ class YookassaPaymentPageController extends Controller
             }
             $playWalletOrder = $order->playWalletOrder;
 
+            if (!isset($playWalletOrder)) {
+                return response()->json([
+                    'message' => 'PlayWallet order not found',
+                ])->setStatusCode(code: 404);
+            }
+
             if ($playWalletOrder !== null && $playWalletOrder->status !== ResponseEnum::ERROR->value) {
                 return response()->json(['ok' => true, 'message' => 'Already processing or done']);
             }
