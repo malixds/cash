@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('payment_method');
             $table->string('status')->default('pending');
             $table->text('error_message')->nullable();
+            $table->timestamp('paid_at')->nullable();
+            $table->timestamp('completed_at')->nullable();
             $table->timestamp('created_at')->default(now());
             $table->timestamp('updated_at')->nullable();
         });

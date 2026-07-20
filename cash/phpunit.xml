@@ -19,6 +19,7 @@
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <env name="APP_KEY" value="base64:YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWE="/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
@@ -32,5 +33,15 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="PAYMENT_PROVIDER" value="mock"/>
+        <env name="PAYMENT_WEBHOOK_SECRET" value="test-webhook-secret"/>
+        <env name="ADMIN_API_TOKEN" value="test-admin-token"/>
+        <env name="PLAYWALLET_ENVIRONMENT" value="dev"/>
+        <env name="PLAYWALLET_URL_DEV" value="https://playwallet.test/api/merchant/"/>
+        <env name="PLAYWALLET_API_KEY_DEV" value="test-playwallet-key"/>
+        <env name="PLAYWALLET_SERVICE_ID" value="00000000-0000-4000-8000-000000000001"/>
+        <env name="YOOKASSA_ID" value="test-shop"/>
+        <env name="YOOKASSA_KEY" value="test-secret"/>
+        <env name="YOOKASSA_RETURN_URL" value="http://localhost"/>
     </php>
 </phpunit>

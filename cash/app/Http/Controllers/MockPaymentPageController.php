@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\PlayWallets\PlayWalletCreateDTO;
+use App\Enums\Order\OrderStatusEnum;
+use App\Enums\Payment\PaymentsStatusEnum;
+use App\Jobs\PlayWallets\PlayWalletPaymentJob;
 use App\Models\Order;
 use App\Models\Payment;
-use App\Providers\MockPaymentProvider;
-use App\Services\Orders\OrderProcessor;
 use Illuminate\Http\RedirectResponse;
 
 class MockPaymentPageController extends Controller
@@ -27,8 +29,6 @@ class MockPaymentPageController extends Controller
     public function complete(
         string $orderPublicId,
         string $paymentId,
-        MockPaymentProvider $provider,
-        OrderProcessor $processor,
     ): RedirectResponse {
         $order = Order::query()->where('public_id', $orderPublicId)->firstOrFail();
         $payment = Payment::query()
@@ -36,27 +36,31 @@ class MockPaymentPageController extends Controller
             ->where('provider_payment_id', $paymentId)
             ->firstOrFail();
 
-        $payload = [
-            'payment_id' => $payment->provider_payment_id,
-            'status' => 'paid',
-            'amount' => $payment->amount,
-            'order_id' => $order->public_id,
-        ];
+        if (! in_array($order->status, [
+            OrderStatusEnum::PROCESSING->value,
+            OrderStatusEnum::COMPLETED->value,
+        ], true)) {
+            $serviceId = (string) config('services.playwallet.service_id', '');
+            if ($serviceId === '') {
+                abort(500, 'PLAYWALLET_SERVICE_ID is not configured.');
+            }
 
-        $secret = (string) env('PAYMENT_WEBHOOK_SECRET', '');
-        $signature = hash_hmac('sha256', json_encode($payload, JSON_UNESCAPED_UNICODE), $secret);
-
-        if ($provider->verifyWebhook($payload, $signature)) {
             $payment->update([
-                'status' => 'paid',
+                'status' => PaymentsStatusEnum::SUCCEEDED->value,
                 'paid_at' => now(),
-                'provider_payload' => $payload,
             ]);
             $order->update([
-                'status' => 'paid',
+                'status' => OrderStatusEnum::PROCESSING->value,
                 'paid_at' => now(),
             ]);
-            $processor->processPaidOrder($order);
+
+            PlayWalletPaymentJob::dispatch(new PlayWalletCreateDTO(
+                orderId: $order->id,
+                externalOrderId: $order->external_id,
+                serviceId: $serviceId,
+                login: $order->steam_login,
+                amount: $order->amount,
+            ));
         }
 
         return redirect('/?order='.$order->public_id);

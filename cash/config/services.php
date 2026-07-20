@@ -35,7 +35,17 @@ return [
         ],
     ],
 
+    'admin' => [
+        'token' => env('ADMIN_API_TOKEN'),
+    ],
+
+    'payment' => [
+        // yookassa | mock
+        'provider' => env('PAYMENT_PROVIDER', 'yookassa'),
+    ],
+
     'playwallet' => [
+        'environment' => env('PLAYWALLET_ENVIRONMENT', 'dev'),
         'url_dev' => env('PLAYWALLET_URL_DEV', 'https://dev.merchant.playwallet.bot/api/merchant/'),
         'api_key_dev' => env('PLAYWALLET_API_KEY_DEV'),
         'url_prod' => env('PLAYWALLET_URL_PROD', 'https://merchant.playwallet.bot/api/merchant/'),
@@ -46,6 +56,6 @@ return [
     'yookassa' => [
         'shop_id' => env('YOOKASSA_ID'),
         'secret_key' => env('YOOKASSA_KEY'),
-        'return_url' => env('YOOKASSA_RETURN_URL'),
+        'return_url' => env('YOOKASSA_RETURN_URL', env('APP_URL', 'http://localhost')),
     ],
 ];

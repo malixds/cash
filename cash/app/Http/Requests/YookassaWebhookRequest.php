@@ -20,8 +20,9 @@ class YookassaWebhookRequest extends FormRequest
             'object.id' => ['required', 'string'],
             'object.status' => ['required', 'string'],
             'object.amount.value' => ['required', 'numeric'],
+            'object.amount.currency' => ['required', 'string', 'in:RUB'],
             'object.created_at' => ['required', 'date'],
-            'object.captured_at' => ['required', 'date'],
+            'object.captured_at' => ['nullable', 'date'],
             'object.paid' => ['required', 'boolean'],
         ];
     }

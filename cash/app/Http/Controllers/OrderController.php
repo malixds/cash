@@ -6,30 +6,26 @@ use App\DTO\OrderDTO;
 use App\Enums\Order\OrderStatusEnum;
 use App\Enums\Payment\PaymentsStatusEnum;
 use App\Http\Requests\OrderCreateRequest;
+use App\Interfaces\Payments\PaymentProviderInterface;
 use App\Models\Order;
 use App\Models\Payment;
-use App\Providers\MockPaymentProvider;
-use App\Providers\YookassaPaymentProvider;
-use App\Services\PlayWallet\PlayWalletClientServiceDev;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
 class OrderController extends Controller
 {
     /**
-     * Create a pending order and mock payment, return URL for the payment page.
-     *
+     * Create a new order and payment, then return the provider payment URL.
      */
-    public function createOrder(OrderCreateRequest $request, YookassaPaymentProvider $paymentProvider): JsonResponse
+    public function createOrder(OrderCreateRequest $request, PaymentProviderInterface $paymentProvider): JsonResponse
     {
         $validated = $request->validated();
         $dto = OrderDTO::fromValidated($validated);
-        $paymentUrl = DB::transaction(function () use ($dto, $paymentProvider): string {
+        $created = DB::transaction(function () use ($dto, $paymentProvider): array {
             $order = Order::query()->create([
+                ...$dto->toOrderAttributes(),
                 'status' => OrderStatusEnum::NEW->value,
-                ...$dto->toOrderAttributes()
             ]);
             [$result, $payload] = $paymentProvider->createPayment($order);
 
@@ -43,34 +39,39 @@ class OrderController extends Controller
                 'provider_payload' => $payload,
             ]);
 
-            return $result->paymentUrl;
+            return [
+                'payment_url' => $result->paymentUrl,
+                'order_id' => $order->public_id,
+            ];
         });
 
         return response()->json([
             'ok' => true,
-            'data' => [
-                'payment_url' => $paymentUrl,
-            ],
+            'data' => $created,
         ]);
     }
 
 
-    public function orderStatus(string $id, PlayWalletClientServiceDev $client): JsonResponse
+    public function orderStatus(string $id): JsonResponse
     {
+        $order = Order::query()->with(['payment', 'playWalletOrder'])->findOrFail($id);
+
         return response()->json([
             'ok' => true,
-            'data' => $client->getOrder($id),
+            'data' => $order,
         ]);
     }
 
-    public function orderList(Request $request, PlayWalletClientServiceDev $client): JsonResponse
+    public function orderList(Request $request): JsonResponse
     {
-        $offset = (int)$request->integer('offset', 0);
-        $limit = (int)$request->integer('limit', 10);
+        $limit = min(max($request->integer('limit', 20), 1), 100);
 
         return response()->json([
             'ok' => true,
-            'data' => $client->getOrderList($offset, $limit),
+            'data' => Order::query()
+                ->with(['payment', 'playWalletOrder'])
+                ->latest('id')
+                ->paginate($limit),
         ]);
     }
 }

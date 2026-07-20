@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 
 class MockPaymentProvider implements PaymentProviderInterface
 {
-    public function createPayment(Order $order): PaymentProviderResultDTO
+    public function createPayment(Order $order): array
     {
         $providerPaymentId = (string) Str::uuid();
         $paymentUrl = route('mock.payments.show', [
@@ -17,13 +17,12 @@ class MockPaymentProvider implements PaymentProviderInterface
             'paymentId' => $providerPaymentId,
         ]);
 
-        return new PaymentProviderResultDTO(
+        $result = new PaymentProviderResultDTO(
             providerPaymentId: $providerPaymentId,
             paymentUrl: $paymentUrl,
-            payload: [
-                'mock' => true,
-            ],
         );
+
+        return [$result, ['mock' => true]];
     }
 
     public function verifyWebhook(array $payload, string $signature): bool

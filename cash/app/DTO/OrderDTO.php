@@ -47,7 +47,6 @@ class OrderDTO
             'total' => $total,
             'promo_code' => $this->promoCode,
             'payment_method' => $this->paymentMethod,
-            'status' => 'pending',
         ];
     }
 }

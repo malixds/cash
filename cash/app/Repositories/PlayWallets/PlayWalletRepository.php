@@ -22,23 +22,18 @@ class PlayWalletRepository implements IPlayWalletRepository
 
     public function firstOrCreate(PlayWalletCreateDTO $dto): PlayWalletOrder
     {
-        $playWalletOrder = PlayWalletOrder::query()
-            ->where('order_id', $dto->orderId())
-            ->first();
-
-        if (!isset($playWalletOrder)) {
-            return $this->create($dto);
-        }
-
-        return $playWalletOrder;
+        return PlayWalletOrder::query()->firstOrCreate(
+            ['order_id' => $dto->orderId()],
+            ['status' => ResponseEnum::CREATED->value],
+        );
     }
 
     public function update(PlayWalletOrder $playWalletOrder, SteamPayCreateResultDTO|SteamPayPayResultDTO $dto): PlayWalletOrder
     {
         $playWalletOrder->update([
-            'status' => $dto->getStatus(),
+            'status' => $dto->getStatusOrder() !== '' ? $dto->getStatusOrder() : $dto->getStatus(),
             'play_wallet_uuid' => $dto->getPlayWalletUuid(),
-            'payload' => $dto->getPayload(),
+            'payload' => json_decode($dto->getPayload(), true, flags: JSON_THROW_ON_ERROR),
             'updated_at' => now(),
         ]);
 

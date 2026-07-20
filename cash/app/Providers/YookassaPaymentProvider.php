@@ -17,6 +17,7 @@ use YooKassa\Common\Exceptions\NotFoundException;
 use YooKassa\Common\Exceptions\ResponseProcessingException;
 use YooKassa\Common\Exceptions\TooManyRequestsException;
 use YooKassa\Common\Exceptions\UnauthorizedException;
+use Throwable;
 
 class YookassaPaymentProvider implements PaymentProviderInterface
 {
@@ -41,6 +42,9 @@ class YookassaPaymentProvider implements PaymentProviderInterface
      */
     public function createPayment(Order $order): array
     {
+        $returnUrl = (string) config('services.yookassa.return_url', 'http://localhost/');
+        $separator = str_contains($returnUrl, '?') ? '&' : '?';
+
         $payment = $this->client->createPayment(
             [
                 'amount' => [
@@ -49,17 +53,15 @@ class YookassaPaymentProvider implements PaymentProviderInterface
                 ],
                 'confirmation' => [
                     'type' => 'redirect',
-                    'return_url' => (string)config('services.yookassa.return_url', 'http://localhost:80/'),
+                    'return_url' => $returnUrl.$separator.http_build_query(['order' => $order->public_id]),
                 ],
-                'capture' => true, // важно
-                'description' => 'Заказ №' . $order->id,
-
-                // можно передать свои данные
+                'capture' => true,
+                'description' => 'Заказ №'.$order->id,
                 'metadata' => [
                     'order_id' => $order->id,
                 ],
             ],
-            uniqid('', true)
+            (string) $order->public_id,
         );
 
         return [new PaymentProviderResultDTO(
@@ -70,7 +72,25 @@ class YookassaPaymentProvider implements PaymentProviderInterface
 
     public function verifyWebhook(array $payload, string $signature): bool
     {
-        // YooKassa уведомления проверяются иначе (тело запроса / настройки в ЛК). Заглушка до отдельной реализации.
-        return false;
+        $paymentId = (string) data_get($payload, 'object.id', '');
+        $status = (string) data_get($payload, 'object.status', '');
+        $amount = number_format((float) data_get($payload, 'object.amount.value', 0), 2, '.', '');
+
+        if ($paymentId === '' || $status === '' || $amount === '0.00') {
+            return false;
+        }
+
+        try {
+            $payment = $this->client->getPaymentInfo($paymentId);
+
+            return hash_equals($paymentId, (string) $payment->getId())
+                && hash_equals($status, (string) $payment->getStatus())
+                && hash_equals(
+                    $amount,
+                    number_format((float) $payment->getAmount()->getValue(), 2, '.', ''),
+                );
+        } catch (Throwable) {
+            return false;
+        }
     }
 }

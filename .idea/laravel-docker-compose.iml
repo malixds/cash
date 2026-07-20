@@ -121,6 +121,7 @@
       <excludeFolder url="file://$MODULE_DIR$/cash/vendor/yoomoney/yookassa-sdk-php" />
       <excludeFolder url="file://$MODULE_DIR$/cash/vendor/yoomoney/yookassa-sdk-validator" />
     </content>
+    <content url="file://$USER_HOME$/univ/kurs/kurs" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>

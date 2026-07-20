@@ -17,16 +17,14 @@ class Order extends Model
         'promo_code',
         'payment_method',
         'status',
-        'playwallet_order_id',
-        'playwallet_status',
-        'playwallet_payload',
         'error_message',
         'paid_at',
         'completed_at',
     ];
 
     protected $casts = [
-        'playwallet_payload' => 'array',
+        'amount' => 'integer',
+        'total' => 'integer',
         'paid_at' => 'datetime',
         'completed_at' => 'datetime',
     ];

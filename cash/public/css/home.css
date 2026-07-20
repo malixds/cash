@@ -310,6 +310,30 @@ h1 {
     margin: 10px 0 0;
 }
 
+.order-status {
+    margin: 18px 0 0;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(38, 43, 86, 0.85);
+}
+
+.order-status p {
+    margin: 0;
+    color: var(--text, #f4f6ff);
+    font-weight: 600;
+}
+
+.order-status[data-tone="success"] {
+    border-color: rgba(72, 199, 142, 0.45);
+    background: rgba(33, 84, 58, 0.55);
+}
+
+.order-status[data-tone="error"] {
+    border-color: rgba(255, 107, 129, 0.45);
+    background: rgba(92, 32, 48, 0.55);
+}
+
 @media (max-width: 920px) {
     .hero { grid-template-columns: 1fr; }
     .cards, .plans, .topup-wrap { grid-template-columns: 1fr; }

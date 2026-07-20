@@ -2,68 +2,109 @@
 
 namespace App\Http\Controllers;
 
-
 use App\DTO\PlayWallets\PlayWalletCreateDTO;
+use App\Enums\Order\OrderStatusEnum;
 use App\Enums\Payment\PaymentsStatusEnum;
-use App\Enums\PlayWalletEnums\ResponseEnum;
 use App\Http\Requests\YookassaWebhookRequest;
-use App\Interfaces\Orders\IOrderRepository;
-use App\Interfaces\Payments\IPaymentRepository;
-use App\Interfaces\PlayWallets\IPlayWalletRepository;
+use App\Interfaces\Payments\PaymentProviderInterface;
 use App\Jobs\PlayWallets\PlayWalletPaymentJob;
-
+use App\Models\Payment;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class YookassaPaymentPageController extends Controller
 {
-
-    public function __construct(
-        private readonly IPaymentRepository    $paymentRepository,
-        private readonly IPlayWalletRepository $playWalletRepository,
-    )
+    public function webhook(
+        YookassaWebhookRequest $request,
+        PaymentProviderInterface $paymentProvider,
+    ): JsonResponse
     {
-    }
+        $payload = $request->all();
 
-    public function webhook(YookassaWebhookRequest $request)
-    {
-        $dto = $request->toDto();
-        if (empty($dto->id())) {
-            // TODO: логировать
+        if (! $paymentProvider->verifyWebhook($payload, (string) $request->header('X-Payment-Signature', ''))) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Webhook verification failed.',
+            ], 401);
         }
-        $payment = $this->paymentRepository->findByPaymentId($dto->id());
-        $payment = $this->paymentRepository->update($payment, $dto->toArray());
-        if ($payment->status === PaymentsStatusEnum::SUCCEEDED->value) {
-            $order = $payment->order()->first();
-            if (!isset($order)) {
-                return response()->json([
-                    'message' => 'Order not found',
-                ])->setStatusCode(code: 404);
-            }
-            $playWalletOrder = $order->playWalletOrder;
 
-            if (!isset($playWalletOrder)) {
-                return response()->json([
-                    'message' => 'PlayWallet order not found',
-                ])->setStatusCode(code: 404);
+        $dto = $request->toDto();
+        $payment = Payment::query()
+            ->with('order')
+            ->where('provider_payment_id', $dto->id())
+            ->first();
+
+        if ($payment === null) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Payment not found.',
+            ], 404);
+        }
+
+        if (number_format($dto->amount(), 2, '.', '') !== number_format((float) $payment->amount, 2, '.', '')) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Payment amount mismatch.',
+            ], 422);
+        }
+
+        $jobDto = DB::transaction(function () use ($dto, $payload, $payment): ?PlayWalletCreateDTO {
+            $lockedPayment = Payment::query()
+                ->with('order')
+                ->lockForUpdate()
+                ->findOrFail($payment->id);
+            $order = $lockedPayment->order;
+
+            $lockedPayment->update([
+                'status' => $dto->status(),
+                'paid_at' => $dto->isPaid() ? now() : null,
+                'provider_payload' => $payload,
+            ]);
+
+            if ($dto->status() === PaymentsStatusEnum::CANCELED->value) {
+                $order->update(['status' => OrderStatusEnum::CANCELED->value]);
+
+                return null;
             }
 
-            if ($playWalletOrder !== null && $playWalletOrder->status !== ResponseEnum::ERROR->value) {
-                return response()->json(['ok' => true, 'message' => 'Already processing or done']);
+            if ($dto->status() !== PaymentsStatusEnum::SUCCEEDED->value || ! $dto->isPaid()) {
+                return null;
             }
-            
-            // иначе — dispatch
-            $playWalletCreateDTO = new PlayWalletCreateDTO(
+
+            if (in_array($order->status, [
+                OrderStatusEnum::PROCESSING->value,
+                OrderStatusEnum::COMPLETED->value,
+            ], true)) {
+                return null;
+            }
+
+            $serviceId = (string) config('services.playwallet.service_id', '');
+            if ($serviceId === '') {
+                throw new \RuntimeException('PLAYWALLET_SERVICE_ID is not configured.');
+            }
+
+            $order->update([
+                'status' => OrderStatusEnum::PROCESSING->value,
+                'paid_at' => now(),
+                'error_message' => null,
+            ]);
+
+            return new PlayWalletCreateDTO(
                 orderId: $order->id,
                 externalOrderId: $order->external_id,
-                serviceId: config('services.playwallet.service_id'),
-                login: "123456789", // DEV: 123456789
+                serviceId: $serviceId,
+                login: $order->steam_login,
                 amount: $order->amount,
             );
-            PlayWalletPaymentJob::dispatch(dto: $playWalletCreateDTO);
+        });
+
+        if ($jobDto !== null) {
+            PlayWalletPaymentJob::dispatch($jobDto);
         }
 
         return response()->json([
-            'message' => 'Order is processing , please wait',
             'ok' => true,
+            'message' => $jobDto === null ? 'Webhook already processed.' : 'Order queued for fulfillment.',
         ]);
     }
 }

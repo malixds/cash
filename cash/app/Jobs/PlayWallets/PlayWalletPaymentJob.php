@@ -4,21 +4,29 @@ namespace App\Jobs\PlayWallets;
 
 use App\DTO\PlayWallets\PlayWalletCreateDTO;
 use App\DTO\SteamPay\SteamPayCreateRequestDTO;
+use App\Enums\Order\OrderStatusEnum;
 use App\Enums\PlayWalletEnums\ResponseEnum;
 use App\Interfaces\PlayWallets\IPlayWalletRepository;
 use App\Interfaces\SteamPay\SteamPayClientInterface;
 use App\Services\PlayWallet\PlayWalletRequestContext;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use RuntimeException;
+use Throwable;
 
 class PlayWalletPaymentJob implements ShouldQueue
 {
     use Queueable;
 
+    public int $tries = 3;
+
+    /** @var list<int> */
+    public array $backoff = [10, 60, 180];
+
     public function __construct(
         private readonly PlayWalletCreateDTO $dto,
-    )
-    {
+    ) {
+        $this->afterCommit = true;
     }
 
     public function handle(
@@ -44,12 +52,18 @@ class PlayWalletPaymentJob implements ShouldQueue
 
         if ($steamPayCreateResultDTO === null
             || $steamPayCreateResultDTO->getStatus() !== ResponseEnum::SUCCESS->value) {
-            return;
+            throw new RuntimeException('PlayWallet did not create the order.');
         }
 
         $repository->update($playWalletOrder, $steamPayCreateResultDTO);
 
         if (in_array($steamPayCreateResultDTO->getStatusOrder(), ['completed', 'paid'], true)) {
+            $playWalletOrder->order()->update([
+                'status' => OrderStatusEnum::COMPLETED->value,
+                'completed_at' => now(),
+                'error_message' => null,
+            ]);
+
             return;
         }
 
@@ -58,6 +72,31 @@ class PlayWalletPaymentJob implements ShouldQueue
         if ($steamPayPayResultDTO !== null
             && $steamPayPayResultDTO->getStatus() === ResponseEnum::SUCCESS->value) {
             $repository->update($playWalletOrder, $steamPayPayResultDTO);
+
+            if (in_array($steamPayPayResultDTO->getStatusOrder(), ['completed', 'paid'], true)) {
+                $playWalletOrder->order()->update([
+                    'status' => OrderStatusEnum::COMPLETED->value,
+                    'completed_at' => now(),
+                    'error_message' => null,
+                ]);
+
+                return;
+            }
         }
+
+        throw new RuntimeException('PlayWallet did not complete the order.');
+    }
+
+    public function failed(Throwable $exception): void
+    {
+        $playWalletOrder = \App\Models\PlayWalletOrder::query()
+            ->where('order_id', $this->dto->orderId())
+            ->first();
+
+        $playWalletOrder?->update(['status' => ResponseEnum::ERROR->value]);
+        $playWalletOrder?->order()->update([
+            'status' => OrderStatusEnum::ERROR->value,
+            'error_message' => $exception->getMessage(),
+        ]);
     }
 }

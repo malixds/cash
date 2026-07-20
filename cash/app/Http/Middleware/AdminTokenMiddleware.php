@@ -11,7 +11,7 @@ class AdminTokenMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $configuredToken = (string) env('ADMIN_API_TOKEN', '');
+        $configuredToken = (string) config('services.admin.token', '');
 
         if ($configuredToken === '') {
             return new JsonResponse([

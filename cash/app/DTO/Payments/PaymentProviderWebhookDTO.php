@@ -10,7 +10,7 @@ final readonly class PaymentProviderWebhookDTO
         private string $id,
         private float $amount,
         private string $created_at,
-        private string $captured_at,
+        private ?string $captured_at,
         private bool $isPaid,
     ) {}
     public function type(): string
@@ -38,7 +38,7 @@ final readonly class PaymentProviderWebhookDTO
         return $this->created_at;
     }
 
-    public function capturedAt(): string
+    public function capturedAt(): ?string
     {
         return $this->captured_at;
     }
@@ -46,13 +46,5 @@ final readonly class PaymentProviderWebhookDTO
     public function isPaid(): bool
     {
         return $this->isPaid;
-    }
-    public function toArray(): array
-    {
-        return [
-            'status' => $this->status,
-            'created_at' => $this->created_at,
-            'captured_at' => $this->captured_at,
-        ];
     }
 }
