@@ -8,6 +8,7 @@ use App\Enums\Order\OrderStatusEnum;
 use App\Enums\PlayWalletEnums\ResponseEnum;
 use App\Interfaces\PlayWallets\IPlayWalletRepository;
 use App\Interfaces\SteamPay\SteamPayClientInterface;
+use App\Models\PlayWalletOrder;
 use App\Services\PlayWallet\PlayWalletRequestContext;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -57,7 +58,7 @@ class PlayWalletPaymentJob implements ShouldQueue
 
         $repository->update($playWalletOrder, $steamPayCreateResultDTO);
 
-        if (in_array($steamPayCreateResultDTO->getStatusOrder(), ['completed', 'paid'], true)) {
+        if (in_array($steamPayCreateResultDTO->getStatusOrder(), [ResponseEnum::COMPLETED->value], true)) {
             $playWalletOrder->order()->update([
                 'status' => OrderStatusEnum::COMPLETED->value,
                 'completed_at' => now(),
@@ -73,7 +74,7 @@ class PlayWalletPaymentJob implements ShouldQueue
             && $steamPayPayResultDTO->getStatus() === ResponseEnum::SUCCESS->value) {
             $repository->update($playWalletOrder, $steamPayPayResultDTO);
 
-            if (in_array($steamPayPayResultDTO->getStatusOrder(), ['completed', 'paid'], true)) {
+            if (in_array($steamPayPayResultDTO->getStatusOrder(), [ResponseEnum::COMPLETED->value], true)) {
                 $playWalletOrder->order()->update([
                     'status' => OrderStatusEnum::COMPLETED->value,
                     'completed_at' => now(),
@@ -89,7 +90,7 @@ class PlayWalletPaymentJob implements ShouldQueue
 
     public function failed(Throwable $exception): void
     {
-        $playWalletOrder = \App\Models\PlayWalletOrder::query()
+        $playWalletOrder = PlayWalletOrder::query()
             ->where('order_id', $this->dto->orderId())
             ->first();
 

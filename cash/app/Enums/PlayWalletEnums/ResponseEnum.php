@@ -6,5 +6,8 @@ enum ResponseEnum: string
 {
     case SUCCESS = 'success';
     case CREATED = 'created';
-    case ERROR = 'error'; // НЕ ФАКТ, ЧТО ОН ТАКОЕ ОТПРАВЛЯЕТ
+    case ERROR = 'error';
+    case COMPLETED = 'completed';
+    case ACTIVE = 'active';
+    case QUEUED = 'queued';
 }
