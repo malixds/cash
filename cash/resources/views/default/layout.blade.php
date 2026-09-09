@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="enot" content="f06f99a8" />
-    <title>@yield('title', 'SteamTopUp RU')</title>
+    <title>@yield('title', config('company.brand') . ' — пополнение Steam')</title>
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('logo_clear.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">

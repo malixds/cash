@@ -28,9 +28,10 @@
 
         <aside class="payment-box">
             <h4>Способ оплаты</h4>
-            <label class="pay-option">
-                <input type="radio" name="payment_method" value="sbp" checked>
-                <span>СБП</span>
+            <label class="pay-option pay-option--active">
+                <input type="radio" name="payment_method" value="sbp" checked hidden>
+                <span class="sbp-badge" aria-hidden="true">СБП</span>
+                <span class="pay-option-text">Система быстрых платежей</span>
             </label>
 
             <button class="button button-primary payment-submit" type="submit" form="topupForm">
