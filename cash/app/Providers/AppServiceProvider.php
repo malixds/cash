@@ -39,9 +39,10 @@ class AppServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(PaymentProviderInterface::class, function ($app) {
-            return match (config('services.payment.provider', 'yookassa')) {
+            return match (config('services.payment.provider', 'enot')) {
                 'mock' => $app->make(MockPaymentProvider::class),
-                default => $app->make(YookassaPaymentProvider::class),
+                'yookassa' => $app->make(YookassaPaymentProvider::class),
+                default => $app->make(EnotPaymentProvider::class),
             };
         });
 

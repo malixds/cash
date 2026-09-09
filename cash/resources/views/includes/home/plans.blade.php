@@ -32,10 +32,6 @@
                 <input type="radio" name="payment_method" value="sbp" checked>
                 <span>СБП</span>
             </label>
-            <label class="pay-option">
-                <input type="radio" name="payment_method" value="card">
-                <span>Банковская карта</span>
-            </label>
 
             <button class="button button-primary payment-submit" type="submit" form="topupForm">
                 Перейти к оплате

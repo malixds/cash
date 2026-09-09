@@ -48,9 +48,18 @@ body {
     font-size: 22px;
     font-weight: 800;
     letter-spacing: 0.3px;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
 }
 
 .brand span { color: #ff6fa8; }
+
+.brand-logo {
+    display: block;
+    height: 40px;
+    width: auto;
+}
 
 .badge {
     font-size: 12px;

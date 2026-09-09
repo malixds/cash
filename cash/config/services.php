@@ -40,8 +40,22 @@ return [
     ],
 
     'payment' => [
-        // yookassa | mock
-        'provider' => env('PAYMENT_PROVIDER', 'yookassa'),
+        // enot | yookassa | mock
+        'provider' => env('PAYMENT_PROVIDER', 'enot'),
+    ],
+
+    'enot' => [
+        // Base API url, trailing slash optional.
+        'url' => env('ENOT_URL', 'https://api.enot.io'),
+        // Касса: идентификатор, API-ключ (авторизация) и «Дополнительный ключ» (подпись вебхука).
+        'shop_id' => env('ENOT_SHOP_ID'),
+        'api_key' => env('ENOT_API_KEY'),
+        'secret_key' => env('ENOT_SECRET_KEY'),
+        // Код метода СБП в тарифах кассы (берётся из payment-tariffs, обычно "sbp").
+        'sbp_service_code' => env('ENOT_SBP_SERVICE_CODE', 'sbp'),
+        // Время жизни инвойса в минутах (Enot max — 5 дней).
+        'expire' => (int) env('ENOT_INVOICE_EXPIRE', 300),
+        'return_url' => env('ENOT_RETURN_URL', env('APP_URL', 'http://localhost')),
     ],
 
     'playwallet' => [

@@ -26,7 +26,7 @@ class OrderCreateRequest extends FormRequest
             'login' => ['required', 'string', 'max:255'],
             'amount' => ['required', 'numeric', 'min:1', 'max:500000'],
             'promo' => ['nullable', 'string', 'max:64'],
-            'payment_method' => ['required', 'string', 'in:sbp,card'],
+            'payment_method' => ['required', 'string', 'in:sbp'],
         ];
     }
 }

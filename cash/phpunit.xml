@@ -43,5 +43,9 @@
         <env name="YOOKASSA_ID" value="test-shop"/>
         <env name="YOOKASSA_KEY" value="test-secret"/>
         <env name="YOOKASSA_RETURN_URL" value="http://localhost"/>
+        <env name="ENOT_SHOP_ID" value="00000000-0000-4000-8000-0000000000aa"/>
+        <env name="ENOT_API_KEY" value="test-enot-api-key"/>
+        <env name="ENOT_SECRET_KEY" value="test-enot-secret"/>
+        <env name="ENOT_RETURN_URL" value="http://localhost"/>
     </php>
 </phpunit>
